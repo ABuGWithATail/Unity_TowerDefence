@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Enemy : PoolObject
 {
     [SerializeField] private float moveSpeed = 1f;
-    [SerializeField] private int hp = 1;
+    [SerializeField] private int hp = 10;
     [SerializeField] private int reward = 100;
 
     //Status
