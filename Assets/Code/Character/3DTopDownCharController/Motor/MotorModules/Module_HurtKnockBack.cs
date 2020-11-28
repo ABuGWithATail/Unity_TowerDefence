@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Module_HurtKnockBack : ModuleBase
 {
-    public Module_HurtKnockBack(PlayerMotor motor, PlayerFeedbacks feedback) : base(motor, feedback)
+    public Module_HurtKnockBack(PlayerTopDown3DController motor, PlayerFeedbacks feedback) : base(motor, feedback)
     { }
 
     private float moveXSmoothDampVelocity;
@@ -18,7 +18,7 @@ public class Module_HurtKnockBack : ModuleBase
 
     public override void TickFixedUpdate()
     {
-        motorStatus.currentVelocity.x = Mathf.SmoothDamp(motorStatus.currentVelocity.x, 0f, ref moveXSmoothDampVelocity, settings.HurtSlideSpeed * Time.deltaTime);
+        //motorStatus.currentVelocity = Vector3.SmoothDamp(motorStatus.currentVelocity, 0f, ref moveXSmoothDampVelocity, settings.HurtSlideSpeed * Time.deltaTime);
     }
 
     public override void ModuleExit()

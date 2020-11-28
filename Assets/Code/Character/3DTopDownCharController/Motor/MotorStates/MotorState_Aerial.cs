@@ -4,33 +4,33 @@ using System.Collections.Generic;
 
 public class MotorState_Aerial : MotorStateBase
 {
-    public MotorState_Aerial(PlayerMotor motor, PlayerFeedbacks feedbacks) : base(motor, feedbacks)
+    public MotorState_Aerial(PlayerTopDown3DController player, PlayerFeedbacks feedbacks) : base(player, feedbacks)
     {
         modules = new List<ModuleBase>()
         {
-            new Module_Gravity(motor, feedbacks),
-            new Module_MoveInAir(motor, feedbacks),
-            new Module_Jump(motor, feedbacks),
+            new Module_Gravity(player, feedbacks),
+            new Module_MoveInAir(player, feedbacks),
+            new Module_Jump(player, feedbacks),
+            new Module_BasicAttack(player, feedback),
         };
     }
 
     public override void StateEntry()
     {
         base.StateEntry();
-        feedback.Animator.PlayAerial();
+        feedback.Animator.PlayJump();
     }
 
     public override void TickUpdate()
     {
         base.TickUpdate();
-        feedback.Animator.SetFloat_YVelocity(motorStatus.currentVelocity.y);
     }
 
     protected override void Transitions()
     {
         if (motorStatus.isOnGround && (!motorStatus.isMovingUp || !motorStatus.isJumping))
         {
-            motor.SwitchToNewState(MotorStates.OnGround);
+            player.SwitchToNewState(MotorStates.OnGround);
         }
     }
 }
