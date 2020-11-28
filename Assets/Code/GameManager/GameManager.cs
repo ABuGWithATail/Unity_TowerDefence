@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     private const int StartingHealth = 3; //Max health
     private const int StartingMoney = 100; 
 
-    //Lazy singleton
+    //Static
     public static GameManager Instance;
 
     //Exposed variables
@@ -20,13 +20,12 @@ public class GameManager : MonoBehaviour
     private UIRendererManager ui;
 
     //Stats
-    private int wavesCompleted;
+    private int waveNumber;
     private int money = StartingMoney;
     private int lives = StartingHealth;
 
     //Properties
     public static GameStates gameState { get; private set; } = GameStates.Standby;
-
     private bool IsInPlacementMode => towerPlacer.IsInPlacementMode;
 
     #region MonoBehavior
@@ -34,6 +33,8 @@ public class GameManager : MonoBehaviour
     {
         //Lazy singleton
         Instance = this;
+
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     private void Start()
@@ -56,23 +57,30 @@ public class GameManager : MonoBehaviour
             ReduceLife();
         }
         if (Input.GetKeyDown(KeyCode.M))
+        {
             AddMoney(100);
+        }
 
         //Toggle pause when player pressed Escape
         if (!IsInPlacementMode && (Input.GetKeyDown(KeyCode.Escape)))
         {
             pauseMenu.TogglePause();
+            Cursor.lockState = (pauseMenu.isPaused) ? CursorLockMode.None : CursorLockMode.Confined;
         }
     }
     #endregion
 
     #region Public - stats change
-    public void StartWave(int currentWave)
+    public void StartWave()
     {
-        //Update UI wave count
-        ui.DisplayWave(currentWave);
-        wavesCompleted = currentWave - 1;
-        gameState = GameStates.WaveStarted;
+        if (gameState != GameStates.GameOverScoreboard)
+        {
+            waveNumber++;
+
+            //Update UI wave count
+            ui.DisplayWave(waveNumber);
+            gameState = GameStates.WaveStarted;
+        }
     }
 
     public void AddMoney(int value)
@@ -122,8 +130,9 @@ public class GameManager : MonoBehaviour
     private void GameOver()
     {
         //Tell ui manager we're done and let it decide how to clean up the interface
-        ui.GameOver(wavesCompleted);
+        ui.GameOver(waveNumber - 1 < 0 ? 0 : waveNumber - 1);
         gameState = GameStates.GameOverScoreboard;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     //void GameLost ()

@@ -4,32 +4,29 @@ using System.Collections;
 
 public class MotorState_Hurt : MotorStateBase
 {
-    public MotorState_Hurt(PlayerMotor motor, PlayerFeedbacks feedbacks) : base(motor, feedbacks)
+    public MotorState_Hurt(PlayerTopDown3DController player, PlayerFeedbacks feedbacks) : base(player, feedbacks)
     {
         modules = new List<ModuleBase>()
         {
-            new Module_Gravity(motor, feedbacks),
-            new Module_HurtKnockBack(motor, feedbacks),
+            new Module_Gravity(player, feedbacks),
+            new Module_HurtKnockBack(player, feedbacks),
         };
     }
 
     public override void StateEntry()
     {
         base.StateEntry();
-        feedback.Animator.PlayHurt();
-        
+        //feedback.Animator.PlayHurt();
 
         //Apply knockback
-        int directionalSign = (int)Mathf.Sign(motor.transform.position.x - motorStatus.lastEnemyPosition.x);
-        Vector2 knockBack = settings.HurtDirection;
-        knockBack.x *= directionalSign;
-        motorStatus.currentVelocity = knockBack;
+        //int directionalSign = (int)Mathf.Sign(motor.transform.position.x - motorStatus.lastEnemyPosition.x);
+        //Vector2 knockBack = settings.HurtDirection;
+        //knockBack.x *= directionalSign;
+        //motorStatus.currentVelocity = knockBack;
 
-        //Exit hurt state after a certain duration
-        motor.StartCoroutine(ExitHurtState());
+        ////Exit hurt state after a certain duration
+        //motor.StartCoroutine(ExitHurtState());
     }
-
-
     public override void TickUpdate()
     {
         base.TickUpdate();
@@ -42,7 +39,7 @@ public class MotorState_Hurt : MotorStateBase
 
     public override void StateExit ()
     {
-        feedback.Animator.PlayHurt();
+        //feedback.Animator.PlayHurt();
     }
 
     private IEnumerator ExitHurtState()
@@ -51,11 +48,11 @@ public class MotorState_Hurt : MotorStateBase
 
         if (motorStatus.isOnGround)
         {
-            motor.SwitchToNewState(MotorStates.OnGround);
+            player.SwitchToNewState(MotorStates.OnGround);
         }
         else
         {
-            motor.SwitchToNewState(MotorStates.Aerial);
+            player.SwitchToNewState(MotorStates.Aerial);
         }
     }
 }

@@ -2,16 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class BasicTower : MonoBehaviour
+public abstract class BasicTower : MonoBehaviour
 {
 
-    public Enemy target = null;
+    private Enemy target = null;
 
     private int towerDamage = 1;
     //the two variables allowing for a shoot delay.
     private float currentTime = 0;
     protected float fireRate = 0.5f;
     private float maxRange = 5;
+    
+
+    List<Transform> allEnemies;
 
     protected Enemy TargetedEnemy
     {
@@ -21,43 +24,49 @@ public class BasicTower : MonoBehaviour
         }
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         TargetEnemy();
+        ShootingDelay();
     }
 
-    private void TargetEnemy()
+    protected abstract void RenderAttackVisuals();
+
+    private Enemy TargetEnemy()
     {
-        List<Transform> allEnemies = EnemySpawner.instance.allEnemyPositions;
+        allEnemies = EnemySpawner.instance.allEnemyPositions;
         //Loop through them to find the closest
         float closestDistance = float.MaxValue;
         Transform closest = null;
         foreach (Transform enemy in allEnemies)
         {
             float distanceToEnemy = Vector3.Distance(enemy.transform.position, transform.position);
-            if(distanceToEnemy < closestDistance)
+            if (distanceToEnemy < closestDistance)
             {
                 closestDistance = distanceToEnemy;
                 closest = enemy;
             }
         }
-       
-        target = closest.GetComponent<Enemy>();
-        Debug.LogError("TARGET SELECTED");
-        if (target != null)
+        if (closest != null)
         {
-            ShootingDelay();
+            target = closest.GetComponent<Enemy>();
         }
-        if(target == null)
-        {
-            return;
-        }
+        return target;
+    }
+
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(50, 150, 200, 30), "AllEnemies.count " + allEnemies.Count);
     }
 
     private void ShootAtEnemy()
     {
-        target.TakeDamage(towerDamage);
-        //make the attack visuals happen.
+        float distanceToEnemy = Vector3.Distance(target.transform.position, transform.position);
+            if (distanceToEnemy < maxRange)
+            {
+                target.TakeDamage(towerDamage);
+                RenderAttackVisuals();
+            }        
     }
 
     private void ShootingDelay()
@@ -70,7 +79,7 @@ public class BasicTower : MonoBehaviour
             }
             else
             {
-                currentTime = 0;
+                currentTime = 0;                
                 ShootAtEnemy();
             }
         }

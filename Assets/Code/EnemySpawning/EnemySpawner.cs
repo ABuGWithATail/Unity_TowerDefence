@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    private const float WaveInterval = 6f;
+    private const float WaveInterval = 5f;
 
     //Lazy singleton
     public static EnemySpawner instance;
@@ -25,6 +25,7 @@ public class EnemySpawner : MonoBehaviour
     //Property
     public bool AllWavesFinished { get; private set;}
     public List<Transform> allEnemyPositions { get; private set; }
+
 
     #region MonoBehavior
     private void Awake()
@@ -48,11 +49,12 @@ public class EnemySpawner : MonoBehaviour
     private void Update()
     {
         UpdateAllEnemies();
+       
     }
 
     //private void OnGUI()
     //{
-    //    GUI.Label(new Rect(20, 500, 200, 20), "AllEnemies.count " + AllEnemies.Count());
+    //    GUI.Label(new Rect(20, 500, 200, 20), "AllEnemies.count " + allEnemies.Count());
     //}
     #endregion
 
@@ -66,7 +68,7 @@ public class EnemySpawner : MonoBehaviour
     {
         //Spawn enemy from pool and initialize it
         GameObject pf = pools[enemyType].Spawn();
-        pf.GetComponent<Enemy>().Initialize(paths[pathIndex]);
+        pf.GetComponent<Enemy>().SetPath(paths[pathIndex]);
     }
 
     public void SpawnImmediately ()
@@ -76,11 +78,13 @@ public class EnemySpawner : MonoBehaviour
 
     public void UpdateAllEnemies ()
     {
+        //Cache all enemy positions
         allEnemyPositions = pools.SelectMany(pool => pool.Value.actives).Select(go => go.transform).ToList();
     }
 
     public bool TryGetClosestEnemyToPosition (Vector3 position, out Enemy closestEnemy)
     {
+        //Loop thorugh all enemies and find the closest one
         closestEnemy = null;
         if (allEnemyPositions.Count > 0)
         {
@@ -108,7 +112,7 @@ public class EnemySpawner : MonoBehaviour
     private void SpawnWave()
     {
         //Tell gameManager we're going into a new wave
-        gm.StartWave(waveIndex + 1);
+        gm.StartWave();
 
         //Start wave and pass in a Action callback anonymous method
         waves[waveIndex].StartWave(() => WaveComplete(), this);
@@ -116,15 +120,19 @@ public class EnemySpawner : MonoBehaviour
 
     private void WaveComplete()
     {
-        //When wave is completed, delay then spawn 
-        if (++waveIndex < waves.Count)
-        {
-            StartCoroutine(DelayThenSpawnWave());
-        }
-        else
-        {
-            AllWavesFinished = true;
-        }
+        waveIndex = ++waveIndex >= waves.Count ? 0 : waveIndex;
+
+        StartCoroutine(DelayThenSpawnWave());
+
+        //if (++waveIndex < waves.Count)
+        //{
+        //    StartCoroutine(DelayThenSpawnWave());
+        //}
+        //else
+        //{
+        //    waves = 0;
+        //    //AllWavesFinished = true;
+        //}
     }
 
     private IEnumerator DelayThenSpawnWave()

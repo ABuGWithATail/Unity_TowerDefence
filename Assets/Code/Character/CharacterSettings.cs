@@ -2,14 +2,15 @@
 using System.Collections;
 
 [DefaultExecutionOrder(-9000)] 
-public class CharacterMotorSettings : MonoBehaviour
+public class CharacterSettings : MonoBehaviour
 {
-    public static CharacterMotorSettings instance { get; private set; }
+    public static CharacterSettings instance { get; private set; }
 
     [Header("Layers")]
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask enemyLayer;
     public LayerMask GroundLayer => groundLayer;
-
+    public LayerMask EnemyLayer => enemyLayer;
 
     [Header("Player Movement")]
     [SerializeField] private float steerSpeedGround = 1f; //50f
@@ -22,7 +23,6 @@ public class CharacterMotorSettings : MonoBehaviour
     public float PlayerRunSpeed => playeRunSpeed;
     public float PlayerMoveSpeed => playerWalkSpeed;
     public float PlayerCrawlSpeed => playerCrouchSpeed;
-
 
     [Header("Normal Jump")]
     [SerializeField] private float minJumpForce = 12f;
